@@ -1,17 +1,26 @@
 class Protoz {
-  static getPrototypeChain(obj: object, times: number = 1): object[] {
-    let prototype = obj;
-    const prototypeChain: object[] = [obj];
+  static getPrototypeChain(
+    targetObject: object,
+    maxIterations: number | undefined = undefined
+  ): object[] {
+    let currentPrototype = targetObject;
+    const prototypeChain: object[] = [currentPrototype];
 
-    for (let i = 0; i < times; i++) {
-      const nextPrototype = Object.getPrototypeOf(prototype);
+    while (true) {
+      const stopCondition = maxIterations !== undefined && prototypeChain.length >= maxIterations;
+
+      if (stopCondition) {
+        break;
+      }
+
+      const nextPrototype = Object.getPrototypeOf(currentPrototype);
 
       if (nextPrototype === null) {
         break;
       }
 
-      prototype = nextPrototype;
-      prototypeChain.push(prototype);
+      prototypeChain.push(nextPrototype);
+      currentPrototype = nextPrototype;
     }
 
     return prototypeChain;
@@ -31,7 +40,7 @@ class Protoz {
       prototype = Object.getPrototypeOf(prototype);
     }
 
-    return null; // No ancestor found with the property
+    return null;
   }
 
   static hasProperty(obj: object, property: string): boolean {
