@@ -1,8 +1,5 @@
 class Protoz {
-  static getPrototypeChain(
-    targetObject: object,
-    maxIterations: number | undefined = undefined
-  ): object[] {
+  static getPrototypeChain(targetObject: object, maxIterations: number | undefined = undefined): object[] {
     let currentPrototype = targetObject;
     const prototypeChain: object[] = [currentPrototype];
 
@@ -26,10 +23,7 @@ class Protoz {
     return prototypeChain;
   }
 
-  static findClosestAncestorWithProperty(
-    obj: object,
-    property: string
-  ): object | null {
+  static findClosestAncestorWithProperty(obj: object, property: string): object | null {
     let prototype = Object.getPrototypeOf(obj);
 
     while (prototype !== null) {
@@ -108,35 +102,57 @@ class Protoz {
     return prototype;
   }
 
-  static findFirstCommonAncestor(object1: object, object2: object): object | null {
-    if (object1 === object2) {
-      return Object.getPrototypeOf(object1); // Same object, return its prototype
+  static findFirstCommonAncestor(firstObject: object, secondObject?: object) {
+    let firstCommonAncestor;
+
+    const isSameObject = firstObject === secondObject;
+    const isMissingSecondObject = secondObject === undefined;
+    if (isSameObject || isMissingSecondObject) return getAncester(firstObject);
+
+    let firstObjectPrototype = getAncester(firstObject);
+    let secondObjectPrototype = getAncester(secondObject);
+
+    if (firstObjectPrototype === secondObject) return secondObject;
+    if (secondObjectPrototype === firstObject) return firstObject;
+
+    const noAncestor = firstObjectPrototype === null || secondObjectPrototype === null;
+    if (noAncestor) return null;
+
+    if (firstObjectPrototype === secondObjectPrototype) return firstObjectPrototype;
+
+    const uniqueAncestors = new Set();
+    const trackAncestor = (object: object) => uniqueAncestors.add(getAncester(object));
+    const isAncestorCommon = (object: object) => uniqueAncestors.has(getAncester(object));
+
+    function getAncester(object: object) {
+      return Object.getPrototypeOf(object);
     }
 
-    const prototypes1: object[] = [];
-    const prototypes2: object[] = [];
-
-    function collectPrototypes(obj: object, prototypes: object[]): void {
-      let currentPrototype = obj;
-
-      while (currentPrototype !== null) {
-        prototypes.push(currentPrototype);
-        currentPrototype = Object.getPrototypeOf(currentPrototype);
-      }
+    function addAncestors(object: object) {
+      let currentObject = object;
+      do {
+        trackAncestor(currentObject);
+        currentObject = getAncester(currentObject);
+      } while (currentObject);
     }
 
-    collectPrototypes(object1, prototypes1);
-    collectPrototypes(object2, prototypes2);
-
-    for (const prototype1 of prototypes1) {
-      for (const prototype2 of prototypes2) {
-        if (prototype1 === prototype2) {
-          return prototype1; // First common ancestor found
+    function findFirstCommonAncestorInChain(object: object) {
+      let currentObject = object;
+      do {
+        const isTheCommonAncestor = isAncestorCommon(currentObject);
+        if (isTheCommonAncestor) {
+          firstCommonAncestor = currentObject;
+          return;
         }
-      }
+        trackAncestor(currentObject);
+        currentObject = getAncester(currentObject);
+      } while (currentObject);
     }
 
-    return null; // No common ancestor found
+    addAncestors(firstObjectPrototype);
+    findFirstCommonAncestorInChain(secondObjectPrototype);
+
+    return firstCommonAncestor ?? null;
   }
 }
 
