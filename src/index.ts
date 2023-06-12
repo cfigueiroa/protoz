@@ -109,51 +109,34 @@ class Protoz {
   }
 
   static findFirstCommonAncestor(object1: object, object2: object): object | null {
-    console.log('Starting findFirstCommonAncestor function with inputs:', object1, object2);
-
-    // Create a Set to keep track of visited prototypes
-    const visitedPrototypes = new Set();
-    console.log('Created visitedPrototypes Set:', visitedPrototypes);
-
-    // Initialize currentPrototype1 and currentPrototype2 to object1 and object2
-    let currentPrototype1 = object1;
-    let currentPrototype2 = object2;
-    console.log('Initialized currentPrototype1 and currentPrototype2:', currentPrototype1, currentPrototype2);
-
-    // Helper function to update a prototype
-    const updatePrototype = (currentPrototype: object | null, otherObject: object) => {
-      console.log('Updating prototype:', currentPrototype);
-      if (currentPrototype === null) {
-        console.log('Current prototype is null, returning otherObject:', otherObject);
-        return otherObject;
-      } else {
-        visitedPrototypes.add(currentPrototype);
-        console.log('Added current prototype to visitedPrototypes Set:', visitedPrototypes);
-        const newPrototype = Object.getPrototypeOf(currentPrototype);
-        console.log('Returning new prototype:', newPrototype);
-        return newPrototype;
-      }
-    };
-
-    // Loop until currentPrototype1 and currentPrototype2 are equal
-    while (currentPrototype1 !== currentPrototype2) {
-      console.log('Starting new iteration of loop with current prototypes:', currentPrototype1, currentPrototype2);
-
-      // Check if either currentPrototype1 or currentPrototype2 has already been visited
-      if (visitedPrototypes.has(currentPrototype1) || visitedPrototypes.has(currentPrototype2)) {
-        console.log('Either currentPrototype1 or currentPrototype2 has already been visited. No common ancestor found.');
-        return null; // No common ancestor found
-      }
-
-      // Update currentPrototype1 and currentPrototype2
-      console.log('Updating current prototypes...');
-      currentPrototype1 = updatePrototype(currentPrototype1, object2);
-      currentPrototype2 = updatePrototype(currentPrototype2, object1);
-      console.log('Updated current prototypes:', currentPrototype1, currentPrototype2);
+    if (object1 === object2) {
+      return Object.getPrototypeOf(object1); // Same object, return its prototype
     }
 
-    console.log('First common ancestor found:', currentPrototype1);
-    return currentPrototype1; // First common ancestor found
+    const prototypes1: object[] = [];
+    const prototypes2: object[] = [];
+
+    function collectPrototypes(obj: object, prototypes: object[]): void {
+      let currentPrototype = obj;
+
+      while (currentPrototype !== null) {
+        prototypes.push(currentPrototype);
+        currentPrototype = Object.getPrototypeOf(currentPrototype);
+      }
+    }
+
+    collectPrototypes(object1, prototypes1);
+    collectPrototypes(object2, prototypes2);
+
+    for (const prototype1 of prototypes1) {
+      for (const prototype2 of prototypes2) {
+        if (prototype1 === prototype2) {
+          return prototype1; // First common ancestor found
+        }
+      }
+    }
+
+    return null; // No common ancestor found
   }
 }
 
