@@ -101,4 +101,22 @@ describe("Protoz", () => {
       expect(ancestor).toBeNull();
     });
   });
+
+  describe('findFirstCommonAncestor', () => {
+    const object1 = {};
+    const object2 = {};
+    const ancestor = { commonProp: 'value' };
+    Object.setPrototypeOf(object1, ancestor);
+    Object.setPrototypeOf(object2, ancestor);
+
+    it('should return the first common ancestor', () => {
+      const result = Protoz.findFirstCommonAncestor(object1, object2);
+      expect(result).toBe(ancestor);
+    });
+
+    it('should return null if no common ancestor is found', () => {
+      const result = Protoz.findFirstCommonAncestor(object1, {});
+      expect(result).toBeNull();
+    });
+  });
 });

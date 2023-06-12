@@ -1,6 +1,6 @@
 {
   "name": "protoz",
-  "version": "0.0.7",
+  "version": "0.0.71",
   "description": "A lightweight utility library for working with JavaScript prototypes, providing convenient methods to navigate prototype chains and find closest ancestors with specific properties.",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
