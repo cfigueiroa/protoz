@@ -102,15 +102,15 @@ class Protoz {
     return prototype;
   }
 
-  static findFirstCommonAncestor(firstObject: object, secondObject?: object) {
+  static findFirstCommonAncestor(firstObject: object, secondObject?: object): object | null {
     let firstCommonAncestor;
 
     const isSameObject = firstObject === secondObject;
     const isMissingSecondObject = secondObject === undefined;
-    if (isSameObject || isMissingSecondObject) return getAncester(firstObject);
+    if (isSameObject || isMissingSecondObject) return getAncestor(firstObject);
 
-    let firstObjectPrototype = getAncester(firstObject);
-    let secondObjectPrototype = getAncester(secondObject);
+    let firstObjectPrototype = getAncestor(firstObject);
+    let secondObjectPrototype = getAncestor(secondObject);
 
     if (firstObjectPrototype === secondObject) return secondObject;
     if (secondObjectPrototype === firstObject) return firstObject;
@@ -121,32 +121,32 @@ class Protoz {
     if (firstObjectPrototype === secondObjectPrototype) return firstObjectPrototype;
 
     const uniqueAncestors = new Set();
-    const trackAncestor = (object: object) => uniqueAncestors.add(getAncester(object));
-    const isAncestorCommon = (object: object) => uniqueAncestors.has(getAncester(object));
+    const trackAncestor = (object: object) => uniqueAncestors.add(getAncestor(object));
+    const isAncestorCommon = (object: object) => uniqueAncestors.has(getAncestor(object));
 
-    function getAncester(object: object) {
+    function getAncestor(object: object) {
       return Object.getPrototypeOf(object);
     }
 
     function addAncestors(object: object) {
       let currentObject = object;
-      do {
+      while (currentObject) {
         trackAncestor(currentObject);
-        currentObject = getAncester(currentObject);
-      } while (currentObject);
+        currentObject = getAncestor(currentObject);
+      }
     }
 
     function findFirstCommonAncestorInChain(object: object) {
       let currentObject = object;
-      do {
+      while (currentObject) {
         const isTheCommonAncestor = isAncestorCommon(currentObject);
         if (isTheCommonAncestor) {
           firstCommonAncestor = currentObject;
           return;
         }
         trackAncestor(currentObject);
-        currentObject = getAncester(currentObject);
-      } while (currentObject);
+        currentObject = getAncestor(currentObject);
+      }
     }
 
     addAncestors(firstObjectPrototype);
