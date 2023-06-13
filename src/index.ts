@@ -102,32 +102,27 @@ class Protoz {
     return prototype;
   }
 
-  static findFirstMatchingObjectInOppositeChain(firstObject: object, secondObject?: object): object | null {
-    let firstMatchingObject = null;
+  static findFirstCommonAncestor(firstObject: object, secondObject?: object): object | null {
+    let commonAncestor = null;
 
     if (!secondObject) return firstObject;
 
     const firstNewObject = Object.create(firstObject);
     const secondNewObject = Object.create(secondObject);
 
-    const firstNewObjectPrototype = getPrototype(firstNewObject);
-    const secondNewObjectPrototype = getPrototype(secondNewObject);
+    const getPrototype = (object: object) => Object.getPrototypeOf(object)
 
-    if (firstNewObjectPrototype === secondNewObjectPrototype) return firstObject;
+    const firstPrototype = getPrototype(firstNewObject);
+    const secondPrototype = getPrototype(secondNewObject);
+
+    if (firstPrototype === secondPrototype) return firstObject;
 
     const uniqueAncestors = new Set();
 
-    function trackAncestor(object: object) {
-      uniqueAncestors.add(object);
-    }
+    const trackAncestor = (object: object) => uniqueAncestors.add(object);
 
-    function hasCurrentObject(object: object) {
-      return uniqueAncestors.has(object);
-    }
+    const hasCurrentObject = (object: object) => uniqueAncestors.has(object);
 
-    function getPrototype(object: object) {
-      return Object.getPrototypeOf(object);
-    }
 
     function addAncestors(object: object) {
       let currentObject = object;
@@ -141,7 +136,7 @@ class Protoz {
       let currentObject = object;
       while (currentObject) {
         if (hasCurrentObject(currentObject)) {
-          firstMatchingObject = currentObject;
+          commonAncestor = currentObject;
           return;
         }
         trackAncestor(currentObject);
@@ -149,10 +144,10 @@ class Protoz {
       }
     }
 
-    addAncestors(firstNewObjectPrototype);
-    findFirstCommonAncestorInChain(secondNewObjectPrototype);
+    addAncestors(firstPrototype);
+    findFirstCommonAncestorInChain(secondPrototype);
 
-    return firstMatchingObject;
+    return commonAncestor;
   }
 }
 
