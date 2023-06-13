@@ -99,7 +99,7 @@ describe("Protoz", () => {
     });
   });
 
-  describe("findFirstMatchingObjectInOppositeChain", () => {
+  describe("findFirstCommonAncestor", () => {
     const object1 = {};
     const object2 = {};
     const ancestor = { commonProp: "value" };
@@ -107,7 +107,7 @@ describe("Protoz", () => {
     Object.setPrototypeOf(object2, ancestor);
 
     it("should return the first common ancestor", () => {
-      const result = Protoz.findFirstMatchingObjectInOppositeChain(object1, object2);
+      const result = Protoz.findFirstCommonAncestor(object1, object2);
       expect(result).toBe(ancestor);
     });
 
@@ -115,20 +115,20 @@ describe("Protoz", () => {
     const objectPrototype = Object.create(Object.prototype);
     const nullPrototype = Object.create(null);
 
-    const result = Protoz.findFirstMatchingObjectInOppositeChain(objectPrototype, nullPrototype);
+    const result = Protoz.findFirstCommonAncestor(objectPrototype, nullPrototype);
     expect(result).toBeNull();
   });
 
     it("should return the Object.prototype if both objects are literal objects", () => {
-      const result = Protoz.findFirstMatchingObjectInOppositeChain(object1, {});
+      const result = Protoz.findFirstCommonAncestor(object1, {});
       expect(result).toBe(Object.prototype);
     });
 
     it("should return the most ancient object if one object is the ancestor of the other", () => {
-      const result1 = Protoz.findFirstMatchingObjectInOppositeChain(object1, ancestor);
+      const result1 = Protoz.findFirstCommonAncestor(object1, ancestor);
       expect(result1).toBe(ancestor);
 
-      const result2 = Protoz.findFirstMatchingObjectInOppositeChain(ancestor, object2);
+      const result2 = Protoz.findFirstCommonAncestor(ancestor, object2);
       expect(result2).toBe(ancestor);
     });
 
@@ -142,7 +142,7 @@ describe("Protoz", () => {
       Object.setPrototypeOf(object3, deepAncestor);
       Object.setPrototypeOf(object4, deepAncestor2);
 
-      const result = Protoz.findFirstMatchingObjectInOppositeChain(object3, object4);
+      const result = Protoz.findFirstCommonAncestor(object3, object4);
       expect(result).toBe(deepAncestor);
     });
 
@@ -156,7 +156,7 @@ describe("Protoz", () => {
       Object.setPrototypeOf(object5, ancestor2);
       Object.setPrototypeOf(object6, ancestor2);
 
-      const result = Protoz.findFirstMatchingObjectInOppositeChain(object5, object6);
+      const result = Protoz.findFirstCommonAncestor(object5, object6);
       expect(result).toBe(ancestor2);
     });
   });

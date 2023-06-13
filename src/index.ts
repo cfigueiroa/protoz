@@ -103,51 +103,30 @@ class Protoz {
   }
 
   static findFirstCommonAncestor(firstObject: object, secondObject?: object): object | null {
-    let commonAncestor = null;
-
     if (!secondObject) return firstObject;
-
-    const firstNewObject = Object.create(firstObject);
-    const secondNewObject = Object.create(secondObject);
-
-    const getPrototype = (object: object) => Object.getPrototypeOf(object)
-
-    const firstPrototype = getPrototype(firstNewObject);
-    const secondPrototype = getPrototype(secondNewObject);
-
-    if (firstPrototype === secondPrototype) return firstObject;
 
     const uniqueAncestors = new Set();
 
-    const trackAncestor = (object: object) => uniqueAncestors.add(object);
-
-    const hasCurrentObject = (object: object) => uniqueAncestors.has(object);
-
+    const getPrototype = (object: object) => Object.getPrototypeOf(object);
 
     function addAncestors(object: object) {
-      let currentObject = object;
-      while (currentObject) {
-        trackAncestor(currentObject);
-        currentObject = getPrototype(currentObject);
+      for (let currentObject = object; currentObject; currentObject = getPrototype(currentObject)) {
+        uniqueAncestors.add(currentObject);
       }
     }
 
-    function findFirstCommonAncestorInChain(object: object) {
-      let currentObject = object;
-      while (currentObject) {
-        if (hasCurrentObject(currentObject)) {
-          commonAncestor = currentObject;
-          return;
+    function findCommonAncestor(object: object) {
+      for (let currentObject = object; currentObject; currentObject = getPrototype(currentObject)) {
+        if (uniqueAncestors.has(currentObject)) {
+          return currentObject;
         }
-        trackAncestor(currentObject);
-        currentObject = getPrototype(currentObject);
+        uniqueAncestors.add(currentObject);
       }
+      return null;
     }
 
-    addAncestors(firstPrototype);
-    findFirstCommonAncestorInChain(secondPrototype);
-
-    return commonAncestor;
+    addAncestors(firstObject);
+    return findCommonAncestor(secondObject);
   }
 }
 
