@@ -102,31 +102,23 @@ class Protoz {
     return prototype;
   }
 
-  static findFirstCommonAncestor(firstObject: object, secondObject?: object): object | null {
-    if (!secondObject) return firstObject;
+  static findFirstCommonAncestor(firstObject: object, secondObject: object): object | null {
+    if (firstObject && secondObject) {
+      const uniqueAncestors = new Set();
 
-    const uniqueAncestors = new Set();
-
-    const getPrototype = (object: object) => Object.getPrototypeOf(object);
-
-    function addAncestors(object: object) {
-      for (let currentObject = object; currentObject; currentObject = getPrototype(currentObject)) {
+      for (let currentObject = firstObject; currentObject; currentObject = Object.getPrototypeOf(currentObject)) {
         uniqueAncestors.add(currentObject);
       }
-    }
 
-    function findCommonAncestor(object: object) {
-      for (let currentObject = object; currentObject; currentObject = getPrototype(currentObject)) {
+      for (let currentObject = secondObject; currentObject; currentObject = Object.getPrototypeOf(currentObject)) {
         if (uniqueAncestors.has(currentObject)) {
           return currentObject;
         }
         uniqueAncestors.add(currentObject);
       }
-      return null;
     }
 
-    addAncestors(firstObject);
-    return findCommonAncestor(secondObject);
+    return null;
   }
 }
 
